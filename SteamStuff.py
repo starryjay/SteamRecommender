@@ -3,7 +3,8 @@ import time
 from pathlib import Path
 
 import steamspypi
-
+import steamreviews
+import pandas as pd
 
 def get_cooldown():
     cooldown = 62  # 1 minute plus a cushion
@@ -20,8 +21,8 @@ def get_some_sleep():
     return
 
 
-def download_a_single_page(page_no=0):
-    print("Downloading page={} on {}".format(page_no, time.asctime()))
+def download_a_single_page(page_no=1):
+    print(f"Downloading page={page_no} on {time.asctime()}")
 
     data_request = dict()
     data_request["request"] = "all"
@@ -31,8 +32,17 @@ def download_a_single_page(page_no=0):
 
     return data
 
+# def download_reviews(page_no=1):
+#     print(f"Downloading reviews for page={page_no} on {time.asctime()}")
+#
+#     # For every page in folder
+#     # For every game id in page
+#     # Call steam_review_scraper.get_game_review(id=game_id)
+#     # Store result in table
+#     # Concatenate tables until end of page
+#     # Output to csv and start over
 
-def get_file_name(page_no):
+def get_file_name(page_no=1):
     # Get current day as yyyymmdd format
     date_format = "%Y%m%d"
     current_date = time.strftime(date_format)
@@ -45,7 +55,7 @@ def get_file_name(page_no):
 def download_all_pages(num_pages):
     # Download
 
-    for page_no in range(num_pages):
+    for page_no in range(1, num_pages):
         file_name = get_file_name(page_no)
 
         if not Path(file_name).is_file():
@@ -54,14 +64,14 @@ def download_all_pages(num_pages):
             with open(file_name, "w", encoding="utf8") as f:
                 json.dump(page_data, f)
 
-            if page_no != (num_pages - 1):
+            if page_no != (num_pages):
                 get_some_sleep()
 
     # Aggregate
 
     data = dict()
 
-    for page_no in range(num_pages):
+    for page_no in range(1, num_pages):
         file_name = get_file_name(page_no)
 
         with open(file_name, "r", encoding="utf8") as f:
