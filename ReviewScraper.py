@@ -1,17 +1,24 @@
 import json
 import time
 from pathlib import Path
-
+import os
 import steamspypi
 import steamreviews
 import pandas as pd
+import requests
 
 def download_reviews(page_no=1):
     print(f"Downloading reviews for page={page_no} on {time.asctime()}")
     with open(f'20240706_steamspy_page_{page_no}.json') as f:
         page = json.load(f)
     app_ids = page.keys()
-    reviews = steamreviews.download_reviews_for_app_id_batch(app_ids)
+    for appid in page.keys():
+        request_params = dict()
+        request_params['filter'] = 'recent'
+        request_params['day_range'] = '28'
+        reviews = steamreviews.download_reviews_for_app_id(appid, chosen_request_params=request_params)
+
+
     return type(reviews)
 
 if __name__ == '__main__':
